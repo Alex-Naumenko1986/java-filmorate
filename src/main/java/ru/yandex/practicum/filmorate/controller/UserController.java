@@ -47,6 +47,7 @@ public class UserController {
         log.info("Обновлен пользователь: {}", user);
         return user;
     }
+
     private int generateId() {
         return ++generatedId;
     }
