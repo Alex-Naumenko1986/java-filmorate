@@ -24,7 +24,7 @@ public class UserController {
     }
 
     @PostMapping()
-    public User addUser(@Valid @RequestBody User user){
+    public User addUser(@Valid @RequestBody User user) {
         if (idToUser.containsKey(user.getId())) {
             log.error("У добавляемого пользователя не должно быть id. Пользователь с id: {} уже существует",
                     user.getId());
