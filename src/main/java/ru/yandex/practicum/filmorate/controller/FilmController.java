@@ -24,7 +24,7 @@ public class FilmController {
     }
 
     @PostMapping()
-    public Film addFilm(@Valid @RequestBody Film film){
+    public Film addFilm(@Valid @RequestBody Film film) {
         if (idToFilm.containsKey(film.getId())) {
             log.error("У добавляемого фильма не должно быть id. Фильм с id: {} уже существует", film.getId());
             throw new IllegalRequestException("У добавляемого фильма не должно быть id");
