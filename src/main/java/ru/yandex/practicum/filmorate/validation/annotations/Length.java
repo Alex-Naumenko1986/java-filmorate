@@ -14,7 +14,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Length {
     int length() default 200;
+
     String message() default "Максимальная длина описания - 200 символов";
-    Class <?> [] groups() default {};
-    Class <? extends Payload> [] payload() default {};
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
 }
