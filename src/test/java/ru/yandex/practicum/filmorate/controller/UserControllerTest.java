@@ -21,292 +21,292 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest
 class UserControllerTest {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	private static ObjectMapper mapper;
-	private User user;
+    private static ObjectMapper mapper;
+    private User user;
 
-	@BeforeAll
-	static void initialize() {
-		mapper = new ObjectMapper();
-		mapper.findAndRegisterModules();
-	}
+    @BeforeAll
+    static void initialize() {
+        mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
+    }
 
-	@BeforeEach
-	void beforeEach() {
-		user = User.builder().email("naumenko@yandex.ru").login("Cartman").name("Alex")
-				.birthday(LocalDate.of(1986, 7,3)).build();
-	}
+    @BeforeEach
+    void beforeEach() {
+        user = User.builder().email("naumenko@yandex.ru").login("Cartman").name("Alex")
+                .birthday(LocalDate.of(1986, 7, 3)).build();
+    }
 
-	@Test
-	void addUserWithCorrectData() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders
-				.post("/users")
-				.content(asJsonString(user))
-				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.email").value("naumenko@yandex.ru"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.login").value("Cartman"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Alex"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.birthday").value("1986-07-03"));
+    @Test
+    void addUserWithCorrectData() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("naumenko@yandex.ru"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.login").value("Cartman"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Alex"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.birthday").value("1986-07-03"));
 
-	}
+    }
 
-	@Test
-	void emptyAddRequest() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content("")
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isBadRequest());
-	}
+    @Test
+    void emptyAddRequest() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content("")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
-	@Test
-	void addUserWithInvalidLogin() throws Exception {
-		user.setLogin("I am");
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.ALL))
-					.andExpect(status().isBadRequest());
-	}
+    @Test
+    void addUserWithInvalidLogin() throws Exception {
+        user.setLogin("I am");
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL))
+                .andExpect(status().isBadRequest());
+    }
 
-	@Test
-	void addUserWithEmptyLogin() throws Exception {
-		user.setLogin("");
+    @Test
+    void addUserWithEmptyLogin() throws Exception {
+        user.setLogin("");
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.ALL))
-					.andExpect(status().isBadRequest());
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL))
+                .andExpect(status().isBadRequest());
+    }
 
-	@Test
-	void addUserWithEmptyEmail() throws Exception {
-		user.setEmail("");
+    @Test
+    void addUserWithEmptyEmail() throws Exception {
+        user.setEmail("");
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.ALL))
-					.andExpect(status().isBadRequest());
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL))
+                .andExpect(status().isBadRequest());
+    }
 
-	@Test
-	void addUserWithWrongEmail() throws Exception {
-		user.setEmail("yandex-mail@");
+    @Test
+    void addUserWithWrongEmail() throws Exception {
+        user.setEmail("yandex-mail@");
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.ALL))
-					.andExpect(status().isBadRequest());
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL))
+                .andExpect(status().isBadRequest());
+    }
 
-	@Test
-	void addUserWithEmptyName() throws Exception {
-		user.setName("");
+    @Test
+    void addUserWithEmptyName() throws Exception {
+        user.setName("");
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isOk())
-					.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Cartman"));
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Cartman"));
+    }
 
-	@Test
-	void addUserWithWrongBirthday() throws Exception {
-		user.setBirthday(LocalDate.of(2023, 8,15));
+    @Test
+    void addUserWithWrongBirthday() throws Exception {
+        user.setBirthday(LocalDate.of(2023, 8, 15));
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.ALL))
-					.andExpect(status().isBadRequest());
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL))
+                .andExpect(status().isBadRequest());
+    }
 
-	@Test
-	void updateUserWithCorrectData() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isOk());
+    @Test
+    void updateUserWithCorrectData() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
-		user.setId(1);
-		user.setLogin("Eric");
-		user.setEmail("mail@yandex.ru");
+        user.setId(1);
+        user.setLogin("Eric");
+        user.setEmail("mail@yandex.ru");
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.put("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isOk())
-					.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-					.andExpect(MockMvcResultMatchers.jsonPath("$.email").value("mail@yandex.ru"))
-					.andExpect(MockMvcResultMatchers.jsonPath("$.login").value("Eric"))
-					.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Alex"))
-					.andExpect(MockMvcResultMatchers.jsonPath("$.birthday").value("1986-07-03"));
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .put("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("mail@yandex.ru"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.login").value("Eric"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Alex"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.birthday").value("1986-07-03"));
+    }
 
-	@Test
-	void emptyUpdateRequest() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isOk());
+    @Test
+    void emptyUpdateRequest() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.put("/users")
-					.content("")
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isBadRequest());
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .put("/users")
+                        .content("")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
-	@Test
-	void updateUserWithWrongLogin() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isOk());
+    @Test
+    void updateUserWithWrongLogin() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
-		user.setId(1);
-		user.setLogin("I am");
+        user.setId(1);
+        user.setLogin("I am");
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.put("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isBadRequest());
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .put("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
-	@Test
-	void updateUserWithEmptyLogin() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isOk());
+    @Test
+    void updateUserWithEmptyLogin() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
-		user.setId(1);
-		user.setLogin("");
+        user.setId(1);
+        user.setLogin("");
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.put("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isBadRequest());
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .put("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
-	@Test
-	void updateUserWithEmptyEmail() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isOk());
+    @Test
+    void updateUserWithEmptyEmail() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
-		user.setId(1);
-		user.setEmail("");
+        user.setId(1);
+        user.setEmail("");
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.put("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isBadRequest());
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .put("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
-	@Test
-	void updateUserWithWrongEmail() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isOk());
+    @Test
+    void updateUserWithWrongEmail() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
-		user.setId(1);
-		user.setEmail("mail-yandex@");
+        user.setId(1);
+        user.setEmail("mail-yandex@");
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.put("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isBadRequest());
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .put("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
-	@Test
-	void updateUserWithEmptyName() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isOk());
+    @Test
+    void updateUserWithEmptyName() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
-		user.setId(1);
-		user.setName("");
+        user.setId(1);
+        user.setName("");
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.put("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isOk())
-					.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Cartman"));
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .put("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Cartman"));
+    }
 
-	@Test
-	void updateUserWithWrongBirthday() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.post("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isOk());
+    @Test
+    void updateUserWithWrongBirthday() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
-		user.setId(1);
-		user.setBirthday(LocalDate.of(2023, 8, 20));
+        user.setId(1);
+        user.setBirthday(LocalDate.of(2023, 8, 20));
 
-		this.mockMvc.perform(MockMvcRequestBuilders
-					.put("/users")
-					.content(asJsonString(user))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON))
-					.andExpect(status().isBadRequest());
-	}
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .put("/users")
+                        .content(asJsonString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
-	public String asJsonString(final Object obj) {
-		try {
-			return mapper.writeValueAsString(obj);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+    public String asJsonString(final Object obj) {
+        try {
+            return mapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

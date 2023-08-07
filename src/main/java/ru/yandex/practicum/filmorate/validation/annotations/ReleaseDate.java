@@ -14,7 +14,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ReleaseDate {
     String date() default "1895-12-28";
+
     String message() default "Дата релиза должна быть не ранее 28.12.1895";
-    Class <?> [] groups() default {};
-    Class <? extends Payload> [] payload() default {};
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
 }

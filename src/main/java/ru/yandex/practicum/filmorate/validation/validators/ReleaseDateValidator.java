@@ -8,6 +8,7 @@ import java.time.LocalDate;
 
 public class ReleaseDateValidator implements ConstraintValidator<ReleaseDate, LocalDate> {
     private LocalDate releaseDate;
+
     @Override
     public void initialize(ReleaseDate constraintAnnotation) {
         releaseDate = LocalDate.parse(constraintAnnotation.date());
