@@ -137,8 +137,8 @@ public class FilmControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Wall Street"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("2015-05-20"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").
-                        value("Description"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description")
+                        .value("Description"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.duration").value(120));
     }
 
