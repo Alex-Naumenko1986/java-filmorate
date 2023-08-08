@@ -32,20 +32,30 @@ public class UserController {
         }
         int id = generateId();
         user.setId(id);
+        User userClone = User.builder().id(user.getId()).login(user.getLogin()).name(user.getName())
+                .birthday(user.getBirthday()).email(user.getEmail()).build();
+        if (userClone.getName() == null || userClone.getName().isBlank()) {
+            userClone.setName(userClone.getLogin());
+        }
         idToUser.put(id, user);
         log.info("Добавлен новый пользователь: {}", user);
-        return user;
+        return userClone;
     }
 
     @PutMapping()
-    public User updateFilm(@Valid @RequestBody User user) {
+    public User updateUser(@Valid @RequestBody User user) {
         if (!idToUser.containsKey(user.getId())) {
             log.error("Пользователя с id: {} не существует", user.getId());
             throw new IllegalRequestException(String.format("Пользователя с id %d не существует", user.getId()));
         }
+        User userClone = User.builder().id(user.getId()).login(user.getLogin()).name(user.getName())
+                .birthday(user.getBirthday()).email(user.getEmail()).build();
+        if (userClone.getName() == null || userClone.getName().isBlank()) {
+            userClone.setName(userClone.getLogin());
+        }
         idToUser.replace(user.getId(), user);
         log.info("Обновлен пользователь: {}", user);
-        return user;
+        return userClone;
     }
 
     private int generateId() {

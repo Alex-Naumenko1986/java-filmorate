@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class User {
-    private int id;
+    private Integer id;
     @NotBlank(message = "E-mail не должен быть пустым")
     @Email(message = "Некорректный формат e-mail")
     private String email;
@@ -25,11 +25,4 @@ public class User {
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
-
-    public String getName() {
-        if (name == null || name.isBlank()) {
-            return login;
-        }
-        return name;
-    }
 }

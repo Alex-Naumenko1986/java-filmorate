@@ -18,13 +18,17 @@ import java.time.LocalDate;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@WebMvcTest
+@WebMvcTest(FilmController.class)
 public class FilmControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private FilmController filmController;
+
     private static ObjectMapper mapper;
     private Film film;
+    private int addedFilmId;
 
     @BeforeAll
     static void initialize() {
@@ -36,26 +40,27 @@ public class FilmControllerTest {
     void beforeEach() {
         film = Film.builder().name("Bad dog").description("Description")
                 .releaseDate(LocalDate.of(1985, 8, 23)).duration(60).build();
+        addedFilmId = filmController.addFilm(film).getId();
+        film.setId(null);
     }
 
     @Test
-    void addFilmWithCorrectData() throws Exception {
+    void shouldAddFilmWhenDataIsValid() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
                         .post("/films")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Bad dog"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Description"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("1985-08-23"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.duration").value(60));
-
     }
 
     @Test
-    void emptyAddRequest() throws Exception {
+    void shouldReturnErrorWhenSendingEmptyAddRequest() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
                         .post("/films")
                         .content("")
@@ -65,7 +70,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    void addFilmWithEmptyName() throws Exception {
+    void shouldReturnErrorWhenAddFilmWithEmptyName() throws Exception {
         film.setName("");
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -77,7 +82,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    void addFilmWithWrongDescription() throws Exception {
+    void shouldReturnErrorWhenAddFilmWithInvalidDescription() throws Exception {
         film.setDescription("This is a very very long description. This film is about dog which always barks " +
                 "and bites its neighbours. The dog likes to eat and to swim. And the dog also likes children. " +
                 "The name of dog is Samuelson");
@@ -91,7 +96,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    void addFilmWithWrongReleaseDate() throws Exception {
+    void shouldReturnErrorWhenAddFilmWithInvalidReleaseDate() throws Exception {
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -103,7 +108,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    void addFilmWithZeroDuration() throws Exception {
+    void shouldReturnErrorWhenAddFilmWithZeroDuration() throws Exception {
         film.setDuration(0);
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -115,9 +120,11 @@ public class FilmControllerTest {
     }
 
     @Test
-    void updateFilmWithCorrectData() throws Exception {
+    void shouldUpdateFilmWhenDataIsValid() throws Exception {
+        film.setId(addedFilmId);
+
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/films")
+                        .put("/films")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -134,7 +141,7 @@ public class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Wall Street"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("2015-05-20"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description")
@@ -143,14 +150,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    void emptyUpdateRequest() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/films")
-                        .content(asJsonString(film))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
+    void shouldReturnErrorWhenSendingEmptyUpdateRequest() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
                         .put("/films")
                         .content("")
@@ -160,15 +160,8 @@ public class FilmControllerTest {
     }
 
     @Test
-    void updateFilmWithEmptyName() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/films")
-                        .content(asJsonString(film))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        film.setId(1);
+    void shouldReturnErrorWhenUpdateFilmWithEmptyName() throws Exception {
+        film.setId(addedFilmId);
         film.setName("");
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -180,15 +173,8 @@ public class FilmControllerTest {
     }
 
     @Test
-    void updateFilmWithWrongDescription() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/films")
-                        .content(asJsonString(film))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        film.setId(1);
+    void shouldReturnErrorWhenUpdateFilmWithInvalidDescription() throws Exception {
+        film.setId(addedFilmId);
         film.setDescription("This is a very very long description. This film is about dog which always barks " +
                 "and bites its neighbours. The dog likes to eat and to swim. And the dog also likes children. " +
                 "The name of dog is Samuelson");
@@ -202,15 +188,8 @@ public class FilmControllerTest {
     }
 
     @Test
-    void updateFilmWithWrongReleaseDate() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/films")
-                        .content(asJsonString(film))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        film.setId(1);
+    void shouldReturnErrorWhenUpdateFilmWithInvalidReleaseDate() throws Exception {
+        film.setId(addedFilmId);
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -222,15 +201,8 @@ public class FilmControllerTest {
     }
 
     @Test
-    void updateFilmWithZeroDuration() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/films")
-                        .content(asJsonString(film))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        film.setId(1);
+    void shouldReturnErrorWhenUpdateFilmWithZeroDuration() throws Exception {
+        film.setId(addedFilmId);
         film.setDuration(0);
 
         this.mockMvc.perform(MockMvcRequestBuilders

@@ -18,14 +18,19 @@ import java.time.LocalDate;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@WebMvcTest
+@WebMvcTest(UserController.class)
 class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private UserController userController;
+
     private static ObjectMapper mapper;
     private User user;
+
+    private Integer addedUserId;
 
     @BeforeAll
     static void initialize() {
@@ -37,26 +42,27 @@ class UserControllerTest {
     void beforeEach() {
         user = User.builder().email("naumenko@yandex.ru").login("Cartman").name("Alex")
                 .birthday(LocalDate.of(1986, 7, 3)).build();
+        addedUserId = userController.addUser(user).getId();
+        user.setId(null);
     }
 
     @Test
-    void addUserWithCorrectData() throws Exception {
+    void shouldAddUserWhenDataIsValid() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
                         .post("/users")
                         .content(asJsonString(user))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("naumenko@yandex.ru"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.login").value("Cartman"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Alex"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.birthday").value("1986-07-03"));
-
     }
 
     @Test
-    void emptyAddRequest() throws Exception {
+    void shouldReturnErrorWhenSendingEmptyAddRequest() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
                         .post("/users")
                         .content("")
@@ -66,7 +72,7 @@ class UserControllerTest {
     }
 
     @Test
-    void addUserWithInvalidLogin() throws Exception {
+    void shouldReturnErrorWhenAddUserWithInvalidLogin() throws Exception {
         user.setLogin("I am");
         this.mockMvc.perform(MockMvcRequestBuilders
                         .post("/users")
@@ -77,7 +83,7 @@ class UserControllerTest {
     }
 
     @Test
-    void addUserWithEmptyLogin() throws Exception {
+    void shouldReturnErrorWhenAddUserWithEmptyLogin() throws Exception {
         user.setLogin("");
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -89,7 +95,7 @@ class UserControllerTest {
     }
 
     @Test
-    void addUserWithEmptyEmail() throws Exception {
+    void shouldReturnErrorWhenAddUserWithEmptyEmail() throws Exception {
         user.setEmail("");
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -101,7 +107,7 @@ class UserControllerTest {
     }
 
     @Test
-    void addUserWithWrongEmail() throws Exception {
+    void shouldReturnErrorWhenAddUserWithInvalidEmail() throws Exception {
         user.setEmail("yandex-mail@");
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -113,7 +119,7 @@ class UserControllerTest {
     }
 
     @Test
-    void addUserWithEmptyName() throws Exception {
+    void shouldReturnLoginWhenAddUserWithEmptyName() throws Exception {
         user.setName("");
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -126,7 +132,7 @@ class UserControllerTest {
     }
 
     @Test
-    void addUserWithWrongBirthday() throws Exception {
+    void shouldReturnErrorWhenAddUserWithInvalidBirthday() throws Exception {
         user.setBirthday(LocalDate.of(2023, 8, 15));
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -138,15 +144,8 @@ class UserControllerTest {
     }
 
     @Test
-    void updateUserWithCorrectData() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users")
-                        .content(asJsonString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        user.setId(1);
+    void shouldUpdateUserWithValidData() throws Exception {
+        user.setId(addedUserId);
         user.setLogin("Eric");
         user.setEmail("mail@yandex.ru");
 
@@ -156,7 +155,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("mail@yandex.ru"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.login").value("Eric"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Alex"))
@@ -164,14 +163,7 @@ class UserControllerTest {
     }
 
     @Test
-    void emptyUpdateRequest() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users")
-                        .content(asJsonString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
+    void shouldReturnErrorWhenUpdateRequestIsEmpty() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
                         .put("/users")
                         .content("")
@@ -181,15 +173,8 @@ class UserControllerTest {
     }
 
     @Test
-    void updateUserWithWrongLogin() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users")
-                        .content(asJsonString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        user.setId(1);
+    void shouldReturnErrorWhenUpdateUserWithInvalidLogin() throws Exception {
+        user.setId(addedUserId);
         user.setLogin("I am");
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -201,15 +186,8 @@ class UserControllerTest {
     }
 
     @Test
-    void updateUserWithEmptyLogin() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users")
-                        .content(asJsonString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        user.setId(1);
+    void shouldReturnErrorWhenUpdateUserWithEmptyLogin() throws Exception {
+        user.setId(addedUserId);
         user.setLogin("");
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -221,15 +199,8 @@ class UserControllerTest {
     }
 
     @Test
-    void updateUserWithEmptyEmail() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users")
-                        .content(asJsonString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        user.setId(1);
+    void shouldReturnErrorWhenUpdateUserWithEmptyEmail() throws Exception {
+        user.setId(addedUserId);
         user.setEmail("");
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -241,15 +212,8 @@ class UserControllerTest {
     }
 
     @Test
-    void updateUserWithWrongEmail() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users")
-                        .content(asJsonString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        user.setId(1);
+    void shouldReturnErrorWhenUpdateUserWithInvalidEmail() throws Exception {
+        user.setId(addedUserId);
         user.setEmail("mail-yandex@");
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -261,15 +225,8 @@ class UserControllerTest {
     }
 
     @Test
-    void updateUserWithEmptyName() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users")
-                        .content(asJsonString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        user.setId(1);
+    void shouldReturnLoginWhenUpdateUserWithEmptyName() throws Exception {
+        user.setId(addedUserId);
         user.setName("");
 
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -282,15 +239,8 @@ class UserControllerTest {
     }
 
     @Test
-    void updateUserWithWrongBirthday() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users")
-                        .content(asJsonString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        user.setId(1);
+    void shouldReturnErrorWhenUpdateUserWithInvalidBirthday() throws Exception {
+        user.setId(addedUserId);
         user.setBirthday(LocalDate.of(2023, 8, 20));
 
         this.mockMvc.perform(MockMvcRequestBuilders
