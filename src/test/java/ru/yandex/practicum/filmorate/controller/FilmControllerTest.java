@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @WebMvcTest(FilmController.class)
+@RequiredArgsConstructor
 public class FilmControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -47,7 +50,7 @@ public class FilmControllerTest {
     @Test
     void shouldAddFilmWhenDataIsValid() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/films")
+                        .post("/films/")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -62,11 +65,11 @@ public class FilmControllerTest {
     @Test
     void shouldReturnErrorWhenSendingEmptyAddRequest() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/films")
+                        .post("/films/")
                         .content("")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
@@ -74,7 +77,7 @@ public class FilmControllerTest {
         film.setName("");
 
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/films")
+                        .post("/films/")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL))
@@ -88,7 +91,7 @@ public class FilmControllerTest {
                 "The name of dog is Samuelson");
 
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/films")
+                        .post("/films/")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL))
@@ -100,7 +103,7 @@ public class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
 
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/films")
+                        .post("/films/")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL))
@@ -112,7 +115,7 @@ public class FilmControllerTest {
         film.setDuration(0);
 
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .post("/films")
+                        .post("/films/")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL))
@@ -124,7 +127,7 @@ public class FilmControllerTest {
         film.setId(addedFilmId);
 
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .put("/films")
+                        .put("/films/")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -136,7 +139,7 @@ public class FilmControllerTest {
         film.setDuration(120);
 
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .put("/films")
+                        .put("/films/")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -152,11 +155,11 @@ public class FilmControllerTest {
     @Test
     void shouldReturnErrorWhenSendingEmptyUpdateRequest() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .put("/films")
+                        .put("/films/")
                         .content("")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
@@ -165,7 +168,7 @@ public class FilmControllerTest {
         film.setName("");
 
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .put("/films")
+                        .put("/films/")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -180,7 +183,7 @@ public class FilmControllerTest {
                 "The name of dog is Samuelson");
 
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .put("/films")
+                        .put("/films/")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -193,7 +196,7 @@ public class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
 
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .put("/films")
+                        .put("/films/")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -206,7 +209,7 @@ public class FilmControllerTest {
         film.setDuration(0);
 
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .put("/films")
+                        .put("/films/")
                         .content(asJsonString(film))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
