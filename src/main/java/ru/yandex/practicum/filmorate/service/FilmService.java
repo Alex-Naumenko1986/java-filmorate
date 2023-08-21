@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -33,31 +32,21 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public boolean addLike(int filmId, int userId) {
+    public void addLike(int filmId, int userId) {
         Film film = filmStorage.getFilmById(filmId);
         User user = userStorage.getUserById(userId);
-        boolean isLikeAdded = film.addLike(user.getId());
-        if (!isLikeAdded) {
-            return false;
-        }
+        film.addLike(user.getId());
         filmStorage.updateFilm(film);
-        return true;
     }
 
-    public boolean removeLike(int filmId, int userId) {
+    public void removeLike(int filmId, int userId) {
         Film film = filmStorage.getFilmById(filmId);
         User user = userStorage.getUserById(userId);
-        boolean isLikeRemoved = film.removeLike(user.getId());
-        if (!isLikeRemoved) {
-            return false;
-        }
+        film.removeLike(user.getId());
         filmStorage.updateFilm(film);
-        return true;
     }
 
     public List<Film> getMostPopularFilms(int count) {
-        List<Film> allFilms = filmStorage.getAllFilms();
-        return allFilms.stream().sorted((film1, film2) -> Integer.compare(film2.getLikes().size(),
-                film1.getLikes().size())).limit(count).collect(Collectors.toList());
+        return filmStorage.getMostPopularFilms(count);
     }
 }

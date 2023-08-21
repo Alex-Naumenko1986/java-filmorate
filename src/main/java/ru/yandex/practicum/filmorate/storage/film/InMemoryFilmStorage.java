@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -63,6 +64,12 @@ public class InMemoryFilmStorage implements FilmStorage {
                     "не существует", filmId));
         }
         idToFilm.remove(filmId);
+    }
+
+    @Override
+    public List<Film> getMostPopularFilms(int count) {
+        return idToFilm.values().stream().sorted((film1, film2) -> Integer.compare(film2.getLikes().size(),
+                film1.getLikes().size())).limit(count).collect(Collectors.toList());
     }
 
     private int generateId() {

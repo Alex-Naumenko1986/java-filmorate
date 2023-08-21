@@ -1,17 +1,18 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
+@Slf4j
 public class FilmController {
 
     private final FilmService filmService;
@@ -23,12 +24,16 @@ public class FilmController {
 
     @PostMapping()
     public Film addFilm(@Valid @RequestBody Film film) {
-        return filmService.addFilm(film);
+        Film addedFilm = filmService.addFilm(film);
+        log.info("Добавлен фильм: {}", addedFilm);
+        return addedFilm;
     }
 
     @PutMapping()
     public Film updateFilm(@Valid @RequestBody Film film) {
-        return filmService.updateFilm(film);
+        Film updatedFilm = filmService.updateFilm(film);
+        log.info("Обновлен фильм: {}", updatedFilm);
+        return updatedFilm;
     }
 
     @GetMapping("/{id}")
@@ -37,24 +42,13 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Map<String, String> addLike(@PathVariable("id") int filmId, @PathVariable int userId) {
-        boolean isAdded = filmService.addLike(filmId, userId);
-        if (isAdded) {
-            return Map.of("message", "Лайк добавлен");
-        } else {
-            return Map.of("message", "Лайк не добавлен. Возможно, пользователь уже ставил " +
-                    "лайк данному фильму ранее");
-        }
+    public void addLike(@PathVariable("id") int filmId, @PathVariable int userId) {
+        filmService.addLike(filmId, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Map<String, String> removeLike(@PathVariable("id") int filmId, @PathVariable int userId) {
-        boolean isRemoved = filmService.removeLike(filmId, userId);
-        if (isRemoved) {
-            return Map.of("message", "Лайк удален");
-        } else {
-            return Map.of("message", "Лайк не удален. Возможно, пользователь не ставил лайк данному фильму");
-        }
+    public void removeLike(@PathVariable("id") int filmId, @PathVariable int userId) {
+        filmService.removeLike(filmId, userId);
     }
 
     @GetMapping("/popular")

@@ -23,7 +23,6 @@ public class InMemoryUserStorage implements UserStorage {
             log.error("Пользователь с id {} не найден", id);
             throw new UserNotFoundException(String.format("Пользователь с id %d не найден", id));
         }
-        ;
         return idToUser.get(id);
     }
 
@@ -41,6 +40,7 @@ public class InMemoryUserStorage implements UserStorage {
         }
         int id = generateId();
         user.setId(id);
+        replaceNameWithLoginIfNameIsEmpty(user);
         idToUser.put(id, user);
         return user;
     }
@@ -52,6 +52,7 @@ public class InMemoryUserStorage implements UserStorage {
             throw new UserNotFoundException(String.format("Ошибка при обновлении пользователя. Пользователя" +
                     "с id %d не существует", user.getId()));
         }
+        replaceNameWithLoginIfNameIsEmpty(user);
         idToUser.replace(user.getId(), user);
         return user;
     }
@@ -64,6 +65,12 @@ public class InMemoryUserStorage implements UserStorage {
                     "с id %d не существует", userId));
         }
         idToUser.remove(userId);
+    }
+
+    private void replaceNameWithLoginIfNameIsEmpty(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
     }
 
     private int generateId() {

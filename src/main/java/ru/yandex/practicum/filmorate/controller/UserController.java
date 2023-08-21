@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -25,12 +24,16 @@ public class UserController {
 
     @PostMapping()
     public User addUser(@Valid @RequestBody User user) {
-        return userService.addUser(user);
+        User addedUser = userService.addUser(user);
+        log.info("Добавлен новый пользователь: {}", addedUser);
+        return addedUser;
     }
 
     @PutMapping()
     public User updateUser(@Valid @RequestBody User user) {
-        return userService.updateUser(user);
+        User updatedUser = userService.updateUser(user);
+        log.info("Обновлен пользователь: {}", updatedUser);
+        return updatedUser;
     }
 
     @GetMapping("/{id}")
@@ -39,23 +42,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public Map<String, String> addFriend(@PathVariable int id, @PathVariable int friendId) {
-        boolean isAdded = userService.addFriend(id, friendId);
-        if (isAdded) {
-            return Map.of("message", "Пользователи добавлены в друзья");
-        } else {
-            return Map.of("message", "Пользователи не добавлены в друзья. Возможно, они уже являются друзьями");
-        }
+    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public Map<String, String> removeFriend(@PathVariable int id, @PathVariable int friendId) {
-        boolean isRemoved = userService.removeFriend(id, friendId);
-        if (isRemoved) {
-            return Map.of("message", "Пользователи удалены из друзей");
-        } else {
-            return Map.of("message", "Пользователи не удалены из друзей. Возможно, они не были друзьями");
-        }
+    public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.removeFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
