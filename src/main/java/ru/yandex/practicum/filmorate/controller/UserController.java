@@ -1,64 +1,63 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.IllegalRequestException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 @Slf4j
 public class UserController {
-    private Map<Integer, User> idToUser = new HashMap<>();
-    private int generatedId = 0;
+
+    private final UserService userService;
 
     @GetMapping()
     public List<User> getAllUsers() {
-        return new ArrayList<>(idToUser.values());
+        return userService.getAllUsers();
     }
 
     @PostMapping()
     public User addUser(@Valid @RequestBody User user) {
-        if (idToUser.containsKey(user.getId())) {
-            log.error("У добавляемого пользователя не должно быть id. Пользователь с id: {} уже существует",
-                    user.getId());
-            throw new IllegalRequestException("У добавляемого пользователя не должно быть id");
-        }
-        int id = generateId();
-        user.setId(id);
-        User userClone = User.builder().id(user.getId()).login(user.getLogin()).name(user.getName())
-                .birthday(user.getBirthday()).email(user.getEmail()).build();
-        if (userClone.getName() == null || userClone.getName().isBlank()) {
-            userClone.setName(userClone.getLogin());
-        }
-        idToUser.put(id, user);
-        log.info("Добавлен новый пользователь: {}", user);
-        return userClone;
+        User addedUser = userService.addUser(user);
+        log.info("Добавлен новый пользователь: {}", addedUser);
+        return addedUser;
     }
 
     @PutMapping()
     public User updateUser(@Valid @RequestBody User user) {
-        if (!idToUser.containsKey(user.getId())) {
-            log.error("Пользователя с id: {} не существует", user.getId());
-            throw new IllegalRequestException(String.format("Пользователя с id %d не существует", user.getId()));
-        }
-        User userClone = User.builder().id(user.getId()).login(user.getLogin()).name(user.getName())
-                .birthday(user.getBirthday()).email(user.getEmail()).build();
-        if (userClone.getName() == null || userClone.getName().isBlank()) {
-            userClone.setName(userClone.getLogin());
-        }
-        idToUser.replace(user.getId(), user);
-        log.info("Обновлен пользователь: {}", user);
-        return userClone;
+        User updatedUser = userService.updateUser(user);
+        log.info("Обновлен пользователь: {}", updatedUser);
+        return updatedUser;
     }
 
-    private int generateId() {
-        return ++generatedId;
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable int id) {
+        return userService.getUserById(id);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getUserFriends(@PathVariable int id) {
+        return userService.getUserFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        return userService.getCommonFriends(id, otherId);
     }
 }
