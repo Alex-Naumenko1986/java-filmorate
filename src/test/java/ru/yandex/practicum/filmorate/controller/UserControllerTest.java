@@ -1,11 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,7 +21,10 @@ import java.time.LocalDate;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@WebMvcTest(UserController.class)
+@AutoConfigureMockMvc
+@RequiredArgsConstructor
+@SpringBootTest
+@AutoConfigureTestDatabase
 class UserControllerTest {
 
     @Autowired
@@ -133,7 +139,7 @@ class UserControllerTest {
 
     @Test
     void shouldReturnErrorWhenAddUserWithInvalidBirthday() throws Exception {
-        user.setBirthday(LocalDate.of(2023, 8, 30));
+        user.setBirthday(LocalDate.of(2023, 10, 30));
 
         this.mockMvc.perform(MockMvcRequestBuilders
                         .post("/users/")
@@ -241,7 +247,7 @@ class UserControllerTest {
     @Test
     void shouldReturnErrorWhenUpdateUserWithInvalidBirthday() throws Exception {
         user.setId(addedUserId);
-        user.setBirthday(LocalDate.of(2023, 8, 30));
+        user.setBirthday(LocalDate.of(2023, 10, 30));
 
         this.mockMvc.perform(MockMvcRequestBuilders
                         .put("/users/")

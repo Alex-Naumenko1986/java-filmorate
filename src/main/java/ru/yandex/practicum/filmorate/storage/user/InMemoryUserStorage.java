@@ -6,10 +6,8 @@ import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -65,6 +63,37 @@ public class InMemoryUserStorage implements UserStorage {
                     "с id %d не существует", userId));
         }
         idToUser.remove(userId);
+    }
+
+    @Override
+    public void addFriend(int userId, int otherUserId) {
+        User user = getUserById(userId);
+        getUserById(otherUserId);
+        user.addFriend(otherUserId);
+        updateUser(user);
+    }
+
+    @Override
+    public void removeFriend(int userId, int otherUserId) {
+        User user = getUserById(userId);
+        getUserById(otherUserId);
+        user.removeFriend(otherUserId);
+        updateUser(user);
+    }
+
+    @Override
+    public List<User> getUserFriends(int userId) {
+        User user = getUserById(userId);
+        return user.getFriendIds().stream().map(this::getUserById).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> getCommonFriends(int userId, int otherUserId) {
+        User user = getUserById(userId);
+        User otherUser = getUserById(otherUserId);
+        Set<Integer> commonFriendsIds = new HashSet<>(user.getFriendIds());
+        commonFriendsIds.retainAll(otherUser.getFriendIds());
+        return commonFriendsIds.stream().map(this::getUserById).collect(Collectors.toList());
     }
 
     private void replaceNameWithLoginIfNameIsEmpty(User user) {

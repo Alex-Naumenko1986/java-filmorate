@@ -8,8 +8,10 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
+import java.sql.Date;
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -27,7 +29,7 @@ public class User {
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
-    private final Set<Integer> friendIds = new HashSet<>();
+    private Set<Integer> friendIds;
 
     public boolean addFriend(int friendId) {
         return friendIds.add(friendId);
@@ -35,5 +37,14 @@ public class User {
 
     public boolean removeFriend(int friendId) {
         return friendIds.remove(friendId);
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("email", email);
+        values.put("login", login);
+        values.put("name", name);
+        values.put("birthday", Date.valueOf(birthday));
+        return values;
     }
 }
