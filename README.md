@@ -4,7 +4,7 @@ Template repository for Filmorate project.
 
 ## Filmorate database scheme
 
-![DB Scheme.](Filmorate ER diagram.png)
+![DB Scheme.](Filmorate_ER_diagram.png)
 
 ### Примеры запросов:
 
