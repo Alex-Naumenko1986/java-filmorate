@@ -47,8 +47,8 @@ public class FilmControllerTest {
     @BeforeEach
     void beforeEach() {
         film = Film.builder().name("Bad dog").description("Description")
-                .releaseDate(LocalDate.of(1985, 8, 23)).duration(60).
-                mpa(new Rating(1, null)).build();
+                .releaseDate(LocalDate.of(1985, 8, 23)).duration(60)
+                .mpa(new Rating(1, null)).build();
         addedFilmId = filmController.addFilm(film).getId();
         film.setId(null);
     }

@@ -229,8 +229,8 @@ public class FilmDbStorage implements FilmStorage {
         String description = rs.getString("description");
         LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
         int duration = rs.getInt("duration");
-        int rating_id = rs.getInt("rating_id");
-        Rating rating = getMpaById(rating_id);
+        int ratingId = rs.getInt("rating_id");
+        Rating rating = getMpaById(ratingId);
         Set<Integer> likeIds = getLikesInDb(id);
         TreeSet<Genre> genres = getFilmGenresFromDb(id);
         return Film.builder().id(id).name(name).description(description).releaseDate(releaseDate)

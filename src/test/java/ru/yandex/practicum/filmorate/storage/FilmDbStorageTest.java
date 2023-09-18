@@ -53,17 +53,17 @@ public class FilmDbStorageTest {
         TreeSet<Genre> filmGenres = new TreeSet<>();
         filmGenres.add(genre1);
 
-        film1 = Film.builder().name("Film 1").description("description 1").duration(100).
-                releaseDate(LocalDate.of(2010, 3, 20)).mpa(rating1).genres(filmGenres).build();
-        film2 = Film.builder().name("Film 2").description("description 2").duration(150).
-                releaseDate(LocalDate.of(2015, 5, 15)).mpa(rating2).genres(filmGenres).build();
-        film3 = Film.builder().name("Film 3").description("description 3").duration(200).
-                releaseDate(LocalDate.of(2005, 1, 11)).mpa(rating1).genres(filmGenres).build();
+        film1 = Film.builder().name("Film 1").description("description 1").duration(100)
+                .releaseDate(LocalDate.of(2010, 3, 20)).mpa(rating1).genres(filmGenres).build();
+        film2 = Film.builder().name("Film 2").description("description 2").duration(150)
+                .releaseDate(LocalDate.of(2015, 5, 15)).mpa(rating2).genres(filmGenres).build();
+        film3 = Film.builder().name("Film 3").description("description 3").duration(200)
+                .releaseDate(LocalDate.of(2005, 1, 11)).mpa(rating1).genres(filmGenres).build();
 
-        user1 = User.builder().login("login1").name("user1").email("user1@yandex.ru").
-                birthday(LocalDate.of(2000, 3, 20)).build();
-        user2 = User.builder().login("login2").name("user2").email("user2@yandex.ru").
-                birthday(LocalDate.of(2010, 4, 5)).build();
+        user1 = User.builder().login("login1").name("user1").email("user1@yandex.ru")
+                .birthday(LocalDate.of(2000, 3, 20)).build();
+        user2 = User.builder().login("login2").name("user2").email("user2@yandex.ru")
+                .birthday(LocalDate.of(2010, 4, 5)).build();
 
         filmStorage.addFilm(film1);
         userStorage.addUser(user1);

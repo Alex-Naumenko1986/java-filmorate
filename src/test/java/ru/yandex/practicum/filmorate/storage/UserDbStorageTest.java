@@ -33,17 +33,17 @@ public class UserDbStorageTest {
 
     @BeforeEach
     void beforeEach() {
-        user1 = User.builder().login("login1").name("user1").email("user1@yandex.ru").
-                birthday(LocalDate.of(2000, 3, 20)).build();
+        user1 = User.builder().login("login1").name("user1").email("user1@yandex.ru")
+                .birthday(LocalDate.of(2000, 3, 20)).build();
 
-        user2 = User.builder().login("login2").name("user2").email("user2@yandex.ru").
-                birthday(LocalDate.of(2010, 4, 5)).build();
+        user2 = User.builder().login("login2").name("user2").email("user2@yandex.ru")
+                .birthday(LocalDate.of(2010, 4, 5)).build();
 
-        user3 = User.builder().login("login3").name("user3").email("user3@yandex.ru").
-                birthday(LocalDate.of(1990, 12, 18)).build();
+        user3 = User.builder().login("login3").name("user3").email("user3@yandex.ru")
+                .birthday(LocalDate.of(1990, 12, 18)).build();
 
-        user4 = User.builder().login("login4").name("user4").email("user4@yandex.ru").
-                birthday(LocalDate.of(1995, 1, 18)).build();
+        user4 = User.builder().login("login4").name("user4").email("user4@yandex.ru")
+                .birthday(LocalDate.of(1995, 1, 18)).build();
 
         userStorage.addUser(user1);
     }
