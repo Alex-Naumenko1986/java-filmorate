@@ -11,7 +11,12 @@ Template repository for Filmorate project.
 1. Получение списка всех пользователей:
 
 ``` sql
-SELECT * FROM users;
+SELECT user_id,
+login,
+name,
+email,
+birthday
+FROM users;
 ```
 
 2. Получение 10 фильмов с наибольшим числом лайков:
@@ -33,7 +38,12 @@ LIMIT 10;
 3. Получение списка друзей пользователя c id=1:
 
 ``` sql
-SELECT * FROM users as u 
+SELECT u.user_id,
+u.login,
+u.name,
+u.email,
+u.birthday 
+FROM users as u 
 JOIN friends as f ON u.user_id = f.friend_id
 WHERE f.user_id = 1;
 ```

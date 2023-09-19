@@ -18,7 +18,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User getUserById(int id) {
         if (!idToUser.containsKey(id)) {
-            log.error("Пользователь с id {} не найден", id);
+            log.error("User with id {} was not found", id);
             throw new UserNotFoundException(String.format("Пользователь с id %d не найден", id));
         }
         return idToUser.get(id);
@@ -32,7 +32,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User addUser(User user) {
         if (idToUser.containsKey(user.getId())) {
-            log.error("Пользователь с id {} уже существует", user.getId());
+            log.error("User with id {} already exists", user.getId());
             throw new UserAlreadyExistsException(String.format("Ошибка при создании пользователя. Пользователь" +
                     "с id %d уже существует", user.getId()));
         }
@@ -46,7 +46,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         if (!idToUser.containsKey(user.getId())) {
-            log.error("Пользователя с id {} не существует", user.getId());
+            log.error("User with id {} does not exist", user.getId());
             throw new UserNotFoundException(String.format("Ошибка при обновлении пользователя. Пользователя" +
                     "с id %d не существует", user.getId()));
         }
@@ -58,7 +58,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public void deleteUser(int userId) {
         if (!idToUser.containsKey(userId)) {
-            log.error("Пользователя с id {} не существует", userId);
+            log.error("User with id {} does not exist", userId);
             throw new UserNotFoundException(String.format("Ошибка при удалении пользователя. Пользователя" +
                     "с id %d не существует", userId));
         }

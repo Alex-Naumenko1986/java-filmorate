@@ -39,7 +39,3 @@ CREATE TABLE IF NOT EXISTS friends (
         user_id integer REFERENCES users (user_id),
         friend_id integer REFERENCES users (user_id)
 );
-
-
-
-

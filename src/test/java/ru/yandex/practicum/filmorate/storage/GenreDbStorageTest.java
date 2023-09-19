@@ -21,11 +21,10 @@ public class GenreDbStorageTest {
     private final GenreDbStorage genreStorage;
 
     @Test
-    void testGetGenreById() {
+    void shouldGetCorrectGenreById() {
         Genre genre = genreStorage.getGenreById(1);
-        assertEquals(1, genre.getId(), "Идентификатор полученного из БД жанра не равен 1");
-        assertEquals("Комедия", genre.getName(), "Название полученного из БД жанра не " +
-                "совпадает с ожидаемым");
+        Genre expectedGenre = new Genre(1, "Комедия");
+        assertEquals(expectedGenre, genre, "Полученный из БД жанр не совпадает с ожидаемым");
     }
 
     @Test
@@ -38,9 +37,10 @@ public class GenreDbStorageTest {
     }
 
     @Test
-    void testGetAllGenres() {
+    void shouldReturnAllGenres() {
         List<Genre> genres = genreStorage.getAllgenres();
-        assertTrue(genres.size() > 0, "Получен пустой список жанров");
-        assertEquals("Комедия", genres.get(0).getName(), "Неверное название жанра");
+        assertAll("Проверка полученного списка всех жанров",
+                () -> assertTrue(genres.size() > 0, "Получен пустой список жанров"),
+                () -> assertEquals("Комедия", genres.get(0).getName(), "Неверное название жанра"));
     }
 }

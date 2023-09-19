@@ -25,14 +25,14 @@ public class FilmController {
     @PostMapping()
     public Film addFilm(@Valid @RequestBody Film film) {
         Film addedFilm = filmService.addFilm(film);
-        log.info("Добавлен фильм: {}", addedFilm);
+        log.info("New film was added: {}", addedFilm);
         return addedFilm;
     }
 
     @PutMapping()
     public Film updateFilm(@Valid @RequestBody Film film) {
         Film updatedFilm = filmService.updateFilm(film);
-        log.info("Обновлен фильм: {}", updatedFilm);
+        log.info("Film was updated: {}", updatedFilm);
         return updatedFilm;
     }
 
@@ -54,7 +54,7 @@ public class FilmController {
     @DeleteMapping("/{id}")
     public void removeFilm(@PathVariable("id") int filmId) {
         filmService.removeFilm(filmId);
-        log.info("Удален фильм с id: {}", filmId);
+        log.info("Removed film with id: {}", filmId);
     }
 
     @GetMapping("/popular")

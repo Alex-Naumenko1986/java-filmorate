@@ -19,13 +19,13 @@ public class RatingDbStorage implements RatingStorage {
 
     @Override
     public List<Rating> getAllRatings() {
-        String sql = "select * from ratings";
+        String sql = "select rating_id, name from ratings";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeRating(rs));
     }
 
     @Override
     public Rating getRatingById(int id) {
-        String sql = "select * from ratings where rating_id = ?";
+        String sql = "select rating_id, name from ratings where rating_id = ?";
 
         try {
             return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> makeRating(rs), id);

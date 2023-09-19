@@ -31,7 +31,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(int id) {
-        String sql = "select * from films where film_id = ?";
+        String sql = "select film_id, name, description, release_date, duration, rating_id " +
+                "from films where film_id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> makeFilm(rs), id);
         } catch (EmptyResultDataAccessException e) {
@@ -41,14 +42,15 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllFilms() {
-        String sql = "select * from films";
+        String sql = "select film_id, name, description, release_date, duration, rating_id from films";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs));
     }
 
     @Override
     public Film addFilm(Film film) {
         if (film.getId() != null) {
-            String sql = "select * from films where film_id = ?";
+            String sql = "select film_id, name, description, release_date, duration, rating_id " +
+                    "from films where film_id = ?";
             List<Film> films = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), film.getId());
             if (films.size() != 0) {
                 throw new FilmAlreadyExistsException(String.format("Фильм с id %d уже существует", film.getId()));
@@ -57,7 +59,7 @@ public class FilmDbStorage implements FilmStorage {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("films")
                 .usingGeneratedKeyColumns("film_id");
-        int filmId = simpleJdbcInsert.executeAndReturnKey(film.toMap()).intValue();
+        int filmId = simpleJdbcInsert.executeAndReturnKey(convertFilmToMap(film)).intValue();
         film.setId(filmId);
         if (film.getGenres() == null) {
             film.setGenres(new TreeSet<>());
@@ -90,7 +92,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setGenres(getFilmGenresFromDb(filmId));
         film.setMpa(getMpaById(film.getMpa().getId()));
 
-        log.info("В базу данных добавлен фильм: {}", film);
+        log.info("New film is added to database: {}", film);
         return film;
     }
 
@@ -166,7 +168,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setGenres(getFilmGenresFromDb(film.getId()));
         film.setMpa(getMpaById(film.getMpa().getId()));
 
-        log.info("В базе данных обновлен фильм: {}", film);
+        log.info("Updated film in database: {}", film);
         return film;
     }
 
@@ -183,7 +185,7 @@ public class FilmDbStorage implements FilmStorage {
         String deleteFilmSql = "delete from films where film_id = ?";
         jdbcTemplate.update(deleteFilmSql, filmId);
 
-        log.info("Из базы данных удален фильм с id: {}", filmId);
+        log.info("Removed film with id: {} from database", filmId);
     }
 
     @Override
@@ -211,14 +213,14 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Set<Integer> getLikesInDb(int filmId) {
-        String sql = "select * from film_likes where film_id = ?";
+        String sql = "select user_id from film_likes where film_id = ?";
         List<Integer> userWhoLikedIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("user_id"),
                 filmId);
         return new HashSet<>(userWhoLikedIds);
     }
 
     private TreeSet<Genre> getFilmGenresFromDb(int filmId) {
-        String sql = "select * from film_genres where film_id = ?";
+        String sql = "select film_id, genre_id from film_genres where film_id = ?";
         List<Genre> filmGenres = jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs), filmId);
         return new TreeSet<>(filmGenres);
     }
@@ -235,6 +237,16 @@ public class FilmDbStorage implements FilmStorage {
         TreeSet<Genre> genres = getFilmGenresFromDb(id);
         return Film.builder().id(id).name(name).description(description).releaseDate(releaseDate)
                 .duration(duration).mpa(rating).likes(likeIds).genres(genres).build();
+    }
+
+    public Map<String, Object> convertFilmToMap(Film film) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("name", film.getName());
+        values.put("description", film.getDescription());
+        values.put("release_date", Date.valueOf(film.getReleaseDate()));
+        values.put("duration", film.getDuration());
+        values.put("rating_id", film.getMpa().getId());
+        return values;
     }
 
     private Rating getMpaById(int id) {

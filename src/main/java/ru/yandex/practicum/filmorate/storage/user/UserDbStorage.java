@@ -14,10 +14,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component("UserDbStorage")
 @RequiredArgsConstructor
@@ -27,7 +24,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User getUserById(int id) {
-        String sql = "select * from users where user_id = ?";
+        String sql = "select user_id, login, name, email, birthday from users where user_id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> makeUser(rs), id);
         } catch (EmptyResultDataAccessException e) {
@@ -37,14 +34,14 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getAllUsers() {
-        String sql = "select * from users";
+        String sql = "select user_id, login, name, email, birthday from users";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs));
     }
 
     @Override
     public User addUser(User user) {
         if (user.getId() != null) {
-            String sql = "select * from users where user_id = ?";
+            String sql = "select user_id, login, name, email, birthday from users where user_id = ?";
             List<User> users = jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), user.getId());
             if (users.size() != 0) {
                 throw new UserAlreadyExistsException(String.format("Пользователь с id %d уже существует",
@@ -57,7 +54,7 @@ public class UserDbStorage implements UserStorage {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("user_id");
-        int userId = simpleJdbcInsert.executeAndReturnKey(user.toMap()).intValue();
+        int userId = simpleJdbcInsert.executeAndReturnKey(convertUserToMap(user)).intValue();
         user.setId(userId);
 
         if (user.getFriendIds() == null) {
@@ -76,7 +73,7 @@ public class UserDbStorage implements UserStorage {
 
         jdbcTemplate.batchUpdate(insertFriendIdsSql, batchArgsList);
 
-        log.info("В базу данных добавлен пользователь: {}", user);
+        log.info("New user was added to database: {}", user);
 
         return user;
     }
@@ -125,7 +122,7 @@ public class UserDbStorage implements UserStorage {
 
         jdbcTemplate.batchUpdate(insertFriendsSql, batchArgs);
 
-        log.info("В базе данных обновлен пользователь: {}", user);
+        log.info("User updated in database: {}", user);
 
         return user;
     }
@@ -140,7 +137,7 @@ public class UserDbStorage implements UserStorage {
         String deleteUserSql = "delete from users where user_id = ?";
         jdbcTemplate.update(deleteUserSql, userId);
 
-        log.info("Из базы данных удален пользователь с id: {}", userId);
+        log.info("User with id: {} was removed from database", userId);
     }
 
     @Override
@@ -167,7 +164,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getUserFriends(int userId) {
-        String sql = "select * from users as u join friends as f on u.user_id = f.friend_id " +
+        String sql = "select u.user_id, u.login, u.name, u.email, u.birthday from users as u " +
+                "join friends as f on u.user_id = f.friend_id " +
                 "where f.user_Id = ?";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), userId);
@@ -177,7 +175,8 @@ public class UserDbStorage implements UserStorage {
     public List<User> getCommonFriends(int userId, int otherUserId) {
         getUserById(userId);
         getUserById(otherUserId);
-        String sql = "select * from users as u join friends as f on u.user_id = f.friend_id " +
+        String sql = "select u.user_id, u.login, u.name, u.email, u.birthday from users as u " +
+                "join friends as f on u.user_id = f.friend_id " +
                 "where f.user_Id = ? and f.friend_id in (select friend_id from friends where user_id = ?)";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), userId, otherUserId);
@@ -194,6 +193,15 @@ public class UserDbStorage implements UserStorage {
                 .build();
     }
 
+    public Map<String, Object> convertUserToMap(User user) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("email", user.getEmail());
+        values.put("login", user.getLogin());
+        values.put("name", user.getName());
+        values.put("birthday", Date.valueOf(user.getBirthday()));
+        return values;
+    }
+
     private void replaceNameWithLoginIfNameIsEmpty(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -201,7 +209,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     private Set<Integer> getFriendIdsInDb(int id) {
-        String sql = "select * from friends where user_id = ?";
+        String sql = "select friend_id from friends where user_id = ?";
         List<Integer> friendIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("friend_id"),
                 id);
         return new HashSet<>(friendIds);

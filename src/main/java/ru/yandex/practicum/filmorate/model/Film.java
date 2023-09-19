@@ -8,10 +8,7 @@ import ru.yandex.practicum.filmorate.validation.annotations.ReleaseDate;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
-import java.sql.Date;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -38,15 +35,5 @@ public class Film {
 
     public boolean removeLike(int userId) {
         return likes.remove(userId);
-    }
-
-    public Map<String, Object> toMap() {
-        Map<String, Object> values = new HashMap<>();
-        values.put("name", name);
-        values.put("description", description);
-        values.put("release_date", Date.valueOf(releaseDate));
-        values.put("duration", duration);
-        values.put("rating_id", mpa.getId());
-        return values;
     }
 }

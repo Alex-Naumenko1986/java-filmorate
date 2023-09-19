@@ -49,15 +49,15 @@ public class UserDbStorageTest {
     }
 
     @Test
-    void testAddUser() {
+    void shouldAddUserSuccessfully() {
         User addedUser = userStorage.addUser(user2);
-        assertTrue(addedUser.getId() > 0, "Неверный идентификатор добавленного пользователя");
-        assertEquals("login2", addedUser.getLogin(), "Неверный логин у добавленного пользователя");
-        assertEquals("user2", addedUser.getName(), "Неверное имя у добавленного пользователя");
-        assertEquals("user2@yandex.ru", addedUser.getEmail(),
-                "Неверный e-mail у добавленного пользователя");
-        assertEquals(LocalDate.of(2010, 4, 5), addedUser.getBirthday(),
-                "Неверная дата рождения у добавленного пользователя");
+        assertEquals(user2, addedUser, "Пользователи не совпадают");
+    }
+
+    @Test
+    void shouldAddIdWhenAddUser() {
+        User addedUser = userStorage.addUser(user2);
+        assertTrue(addedUser.getId() > 0, "Неверный id добавленного пользователя");
     }
 
     @Test
@@ -71,7 +71,7 @@ public class UserDbStorageTest {
     }
 
     @Test
-    void testGetUserById() {
+    void shouldReturnUserById() {
         User user = userStorage.getUserById(1);
         assertEquals(user1, user, "Пользователи не совпадают");
     }
@@ -86,12 +86,13 @@ public class UserDbStorageTest {
     }
 
     @Test
-    void testGetAllUsers() {
+    void shouldReturnAllUsers() {
         userStorage.addUser(user2);
         List<User> users = userStorage.getAllUsers();
         List<User> expectedUsers = List.of(user1, user2);
-        assertFalse(users.isEmpty(), "Получен пустой список пользователей");
-        assertEquals(expectedUsers, users, "Списки пользователей не совпадают");
+        assertAll("Проверка полученного списка всех пользователей",
+                () -> assertFalse(users.isEmpty(), "Получен пустой список пользователей"),
+                () -> assertEquals(expectedUsers, users, "Списки пользователей не совпадают"));
     }
 
     @Test
@@ -102,7 +103,7 @@ public class UserDbStorageTest {
     }
 
     @Test
-    void testUpdateUser() {
+    void shouldUpdateUserSuccessfully() {
         userStorage.addUser(user2);
         user1.addFriend(2);
         user1.setName("updatedUser1");
@@ -110,12 +111,7 @@ public class UserDbStorageTest {
         userStorage.updateUser(user1);
 
         User updatedUserFromDb = userStorage.getUserById(1);
-        assertEquals("updatedUser1", updatedUserFromDb.getName(),
-                "Неверное имя у обновленного пользователя");
-        assertEquals("updated1@yandex.ru", updatedUserFromDb.getEmail(),
-                "Неверный e-mail у обновленного пользователя");
-        Set<Integer> expectedFriendIds = Collections.singleton(2);
-        assertEquals(expectedFriendIds, updatedUserFromDb.getFriendIds(), "id друзей не совпадают");
+        assertEquals(user1, updatedUserFromDb, "Пользователи не совпадают");
     }
 
     @Test
@@ -129,7 +125,7 @@ public class UserDbStorageTest {
     }
 
     @Test
-    void testDeleteUser() {
+    void shouldDeleteUserSuccessfully() {
         userStorage.deleteUser(1);
 
         Exception e = assertThrows(UserNotFoundException.class, () -> {
@@ -150,7 +146,7 @@ public class UserDbStorageTest {
     }
 
     @Test
-    void testAddFriend() {
+    void shouldAddFriendSuccessfully() {
         userStorage.addUser(user2);
         userStorage.addFriend(1, 2);
         User user1FromDb = userStorage.getUserById(1);
@@ -187,7 +183,7 @@ public class UserDbStorageTest {
     }
 
     @Test
-    void testRemoveFriend() {
+    void shouldRemoveFriendSuccessfully() {
         userStorage.addUser(user2);
         userStorage.addFriend(1, 2);
         userStorage.removeFriend(1, 2);
@@ -222,7 +218,7 @@ public class UserDbStorageTest {
     }
 
     @Test
-    void testGetUserFriends() {
+    void shouldReturnUserFriendsSuccessfully() {
         userStorage.addUser(user2);
         userStorage.addUser(user3);
         userStorage.addFriend(1, 2);
@@ -233,7 +229,7 @@ public class UserDbStorageTest {
     }
 
     @Test
-    void testGetCommonFriends() {
+    void shouldReturnCommonFriendsSuccessfully() {
         userStorage.addUser(user2);
         userStorage.addUser(user3);
         userStorage.addUser(user4);
@@ -243,11 +239,13 @@ public class UserDbStorageTest {
         userStorage.addFriend(2, 3);
         userStorage.addFriend(2, 4);
         List<User> commonFriends = userStorage.getCommonFriends(1, 2);
-        assertTrue(commonFriends.size() == 2, "Размер списка общих друзей не совпадает с ожидаемым");
-        assertEquals("user3", commonFriends.get(0).getName(), "Имя общего друга не совпадает с " +
-                "ожидаемым");
-        assertEquals("user4", commonFriends.get(1).getName(), "Имя общего друга не совпадает с " +
-                "ожидаемым");
+        assertAll("Проверка списка общих друзей",
+                () -> assertEquals(2, commonFriends.size(),
+                        "Размер списка общих друзей не совпадает с ожидаемым"),
+                () -> assertEquals("user3", commonFriends.get(0).getName(),
+                        "Имя общего друга не совпадает с ожидаемым"),
+                () -> assertEquals("user4", commonFriends.get(1).getName(),
+                        "Имя общего друга не совпадает с ожидаемым"));
     }
 
     @Test

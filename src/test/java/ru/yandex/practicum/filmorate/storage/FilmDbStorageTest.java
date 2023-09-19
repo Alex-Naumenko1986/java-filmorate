@@ -71,17 +71,15 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    void testAddFilm() {
+    void shouldAddIdWhenAddFilm() {
         Film film = filmStorage.addFilm(film2);
         assertTrue(film.getId() > 0, "Неверный id добавленного фильма");
-        assertEquals("Film 2", film.getName(), "Неверное имя добавленного фильма");
-        assertEquals("description 2", film.getDescription(), "Неверное описание добавленного фильма");
-        assertEquals(150, film.getDuration(), "Неверная длительность добавленного фильма");
-        assertEquals(LocalDate.of(2015, 5, 15), film.getReleaseDate(),
-                "Неверная дата выпуска добавленного фильма");
-        assertEquals("PG", film.getMpa().getName(), "Неверный рейтинг добавленного фильма");
-        assertEquals("Комедия", film.getGenres().first().getName(),
-                "Неверный жанр добавленного фильма");
+    }
+
+    @Test
+    void shouldAddFilmSuccessfully() {
+        Film film = filmStorage.addFilm(film2);
+        assertEquals(film2, film, "Фильмы не совпадают");
     }
 
     @Test
@@ -95,7 +93,7 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    void testGetFilmById() {
+    void shouldReturnFilmById() {
         Film film = filmStorage.getFilmById(1);
         assertEquals(film1, film, "Фильмы не совпадают");
     }
@@ -110,12 +108,13 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    void testGetAllFilms() {
+    void shouldReturnAllFilms() {
         filmStorage.addFilm(film2);
         List<Film> films = filmStorage.getAllFilms();
         List<Film> expectedFilms = List.of(film1, film2);
-        assertFalse(films.isEmpty(), "Получен пустой список фильмов");
-        assertEquals(expectedFilms, films, "Списки фильмов не совпадают");
+        assertAll("Проверка полученного списка всех фильмов",
+                () -> assertFalse(films.isEmpty(), "Получен пустой список фильмов"),
+                () -> assertEquals(expectedFilms, films, "Списки фильмов не совпадают"));
     }
 
     @Test
@@ -126,7 +125,7 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    void testUpdateFilm() {
+    void shouldUpdateFilmSuccessfully() {
         film1.setDuration(250);
         film1.setName("Updated film1");
         film1.setMpa(rating2);
@@ -138,16 +137,7 @@ public class FilmDbStorageTest {
         filmStorage.updateFilm(film1);
 
         Film updatedFilmFromDb = filmStorage.getFilmById(1);
-        assertEquals(250, updatedFilmFromDb.getDuration(), "Неверная длительность " +
-                "обновленного фильма");
-        assertEquals("Updated film1", updatedFilmFromDb.getName(),
-                "Неверное название обновленного фильма");
-        assertEquals("PG", updatedFilmFromDb.getMpa().getName(),
-                "Неверный рейтинг обновленного фильма");
-        assertEquals("Драма", updatedFilmFromDb.getGenres().first().getName(),
-                "Неверный жанр обновленного фильма");
-        assertEquals("Мультфильм", updatedFilmFromDb.getGenres().last().getName(),
-                "Неверный жанр обновленного фильма");
+        assertEquals(film1, updatedFilmFromDb, "Фильмы не совпадают");
     }
 
     @Test
@@ -161,7 +151,7 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    void testDeleteFilm() {
+    void shouldDeleteFilmSuccessfully() {
         filmStorage.deleteFilm(1);
 
         Exception e = assertThrows(FilmNotFoundException.class, () -> {
@@ -181,7 +171,7 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    void testAddLike() {
+    void shouldAddLikeSuccessfully() {
         filmStorage.addLike(1, 1);
         Film film1FromDb = filmStorage.getFilmById(1);
         Set<Integer> expectedUserWhoLikedIds = Collections.singleton(1);
@@ -200,7 +190,7 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    void testRemoveLike() {
+    void shouldRemoveLikeSuccessfully() {
         filmStorage.addLike(1, 1);
         filmStorage.addLike(1, 2);
         filmStorage.removeLike(1, 1);
@@ -219,14 +209,14 @@ public class FilmDbStorageTest {
         filmStorage.addLike(2, 2);
         filmStorage.addLike(3, 1);
         List<Film> films = filmStorage.getMostPopularFilms(5);
-        assertTrue(films.size() == 3, "Неверный размер полученного списка фильмов");
-        assertEquals("Film 2", films.get(0).getName(), "Неверное название самого популярного" +
-                "фильма");
-        assertEquals("Film 3", films.get(1).getName(), "Неверное название второго по популярности" +
-                "фильма");
-        assertEquals("Film 1", films.get(2).getName(), "Неверное название третьего по популярности" +
-                "фильма");
-
+        assertAll("Проверка полученного списка самых популярых фильмов",
+                () -> assertEquals(3, films.size(), "Неверный размер полученного списка фильмов"),
+                () -> assertEquals("Film 2", films.get(0).getName(),
+                        "Неверное название самого популярного фильма"),
+                () -> assertEquals("Film 3", films.get(1).getName(),
+                        "Неверное название второго по популярности фильма"),
+                () -> assertEquals("Film 1", films.get(2).getName(),
+                        "Неверное название третьего по популярности фильма"));
     }
 
     @Test
@@ -244,12 +234,11 @@ public class FilmDbStorageTest {
         filmStorage.addLike(2, 2);
         filmStorage.addLike(3, 1);
         List<Film> films = filmStorage.getMostPopularFilms(2);
-        assertTrue(films.size() == 2, "Неверный размер полученного списка фильмов");
-        assertEquals("Film 2", films.get(0).getName(), "Неверное название самого популярного" +
-                "фильма");
-        assertEquals("Film 3", films.get(1).getName(), "Неверное название второго по популярности" +
-                "фильма");
+        assertAll("Проверка полученного списка самых популярых фильмов",
+                () -> assertEquals(2, films.size(), "Неверный размер полученного списка фильмов"),
+                () -> assertEquals("Film 2", films.get(0).getName(),
+                        "Неверное название самого популярного фильма"),
+                () -> assertEquals("Film 3", films.get(1).getName(),
+                        "Неверное название второго по популярности фильма"));
     }
-
-
 }

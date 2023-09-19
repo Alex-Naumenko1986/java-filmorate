@@ -20,10 +20,10 @@ public class RatingDbStorageTest {
     private final RatingDbStorage ratingStorage;
 
     @Test
-    void testGetRatingById() {
+    void shouldReturnCorrectRatingById() {
         Rating mpa = ratingStorage.getRatingById(1);
-        assertEquals(1, mpa.getId(), "Идентификатор рейтинга не совпадает с ожидаемым");
-        assertEquals("G", mpa.getName(), "Полученное имя рейтинга не совпадает с ожидаемым");
+        Rating expectedMpa = new Rating(1, "G");
+        assertEquals(expectedMpa, mpa, "Полученный рейтинг не совпадает с ожидаемым");
     }
 
     @Test
@@ -36,9 +36,10 @@ public class RatingDbStorageTest {
     }
 
     @Test
-    void testGetAllRatings() {
+    void shouldReturnAllRatings() {
         List<Rating> ratings = ratingStorage.getAllRatings();
-        assertTrue(ratings.size() > 0, "Получен пустой список рейтингов");
-        assertEquals("G", ratings.get(0).getName(), "Неверное название рейтинга");
+        assertAll("Проверка полученного списка всех рейтингов",
+                () -> assertTrue(ratings.size() > 0, "Получен пустой список рейтингов"),
+                () -> assertEquals("G", ratings.get(0).getName(), "Неверное название рейтинга"));
     }
 }
