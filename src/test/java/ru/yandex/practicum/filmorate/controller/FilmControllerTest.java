@@ -6,21 +6,26 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@WebMvcTest(FilmController.class)
+@AutoConfigureMockMvc
 @RequiredArgsConstructor
+@SpringBootTest
+@AutoConfigureTestDatabase
 public class FilmControllerTest {
 
     @Autowired
@@ -42,7 +47,8 @@ public class FilmControllerTest {
     @BeforeEach
     void beforeEach() {
         film = Film.builder().name("Bad dog").description("Description")
-                .releaseDate(LocalDate.of(1985, 8, 23)).duration(60).build();
+                .releaseDate(LocalDate.of(1985, 8, 23)).duration(60)
+                .mpa(new Rating(1, null)).build();
         addedFilmId = filmController.addFilm(film).getId();
         film.setId(null);
     }

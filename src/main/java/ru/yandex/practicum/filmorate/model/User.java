@@ -9,7 +9,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 
@@ -27,7 +26,7 @@ public class User {
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
-    private final Set<Integer> friendIds = new HashSet<>();
+    private Set<Integer> friendIds;
 
     public boolean addFriend(int friendId) {
         return friendIds.add(friendId);

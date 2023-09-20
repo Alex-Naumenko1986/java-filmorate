@@ -25,14 +25,14 @@ public class UserController {
     @PostMapping()
     public User addUser(@Valid @RequestBody User user) {
         User addedUser = userService.addUser(user);
-        log.info("Добавлен новый пользователь: {}", addedUser);
+        log.info("New user was added: {}", addedUser);
         return addedUser;
     }
 
     @PutMapping()
     public User updateUser(@Valid @RequestBody User user) {
         User updatedUser = userService.updateUser(user);
-        log.info("Обновлен пользователь: {}", updatedUser);
+        log.info("User updated: {}", updatedUser);
         return updatedUser;
     }
 
@@ -54,6 +54,12 @@ public class UserController {
     @GetMapping("/{id}/friends")
     public List<User> getUserFriends(@PathVariable int id) {
         return userService.getUserFriends(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public void removeUser(@PathVariable("id") int userId) {
+        userService.removeUser(userId);
+        log.info("Removed user with id: {}", userId);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")

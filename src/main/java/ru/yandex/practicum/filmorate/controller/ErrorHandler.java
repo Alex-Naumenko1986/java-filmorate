@@ -3,16 +3,14 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
-@ControllerAdvice(assignableTypes = {FilmController.class, UserController.class})
+@RestControllerAdvice(assignableTypes = {FilmController.class, UserController.class,
+        GenreController.class, RatingController.class})
 @Slf4j
 public class ErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -46,6 +44,20 @@ public class ErrorHandler {
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserNotFoundException(UserNotFoundException e) {
+        log.error("Error occurred", e);
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(GenreNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleGenreNotFoundException(GenreNotFoundException e) {
+        log.error("Error occurred", e);
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(RatingNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleRatingNotFoundException(RatingNotFoundException e) {
         log.error("Error occurred", e);
         return new ErrorResponse(e.getMessage());
     }

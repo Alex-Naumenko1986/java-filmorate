@@ -21,7 +21,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film getFilmById(int id) {
         if (!idToFilm.containsKey(id)) {
-            log.error("Фильм с id {} не найден", id);
+            log.error("Film with id {} was not found", id);
             throw new FilmNotFoundException(String.format("Фильм с id %d не найден", id));
         }
         return idToFilm.get(id);
@@ -35,7 +35,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film addFilm(Film film) {
         if (idToFilm.containsKey(film.getId())) {
-            log.error("Фильм с id {} уже существует", film.getId());
+            log.error("Film with id {} already exists", film.getId());
             throw new FilmAlreadyExistsException(String.format("Ошибка при создании фильма. Фильм с id %d " +
                     "уже существует", film.getId()));
         }
@@ -48,7 +48,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         if (!idToFilm.containsKey(film.getId())) {
-            log.error("Фильма с id {} не существует", film.getId());
+            log.error("Film with id {} does not exist", film.getId());
             throw new FilmNotFoundException(String.format("Ошибка при обновлении фильма. Фильма с id %d" +
                     "не существует", film.getId()));
         }
@@ -59,11 +59,21 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void deleteFilm(int filmId) {
         if (!idToFilm.containsKey(filmId)) {
-            log.error("Фильма с id {} не существует", filmId);
+            log.error("Film with id {} does not exist", filmId);
             throw new FilmNotFoundException(String.format("Ошибка при удалении фильма. Фильма с id %d" +
                     "не существует", filmId));
         }
         idToFilm.remove(filmId);
+    }
+
+    @Override
+    public void addLike(int filmId, int userId) {
+        idToFilm.get(filmId).addLike(userId);
+    }
+
+    @Override
+    public void removeLike(int filmId, int userId) {
+        idToFilm.get(filmId).removeLike(userId);
     }
 
     @Override
